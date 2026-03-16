@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Worksheets Store</title>
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-primary: #2d3436;
+            --text-secondary: #636e72;
+            --accent-color: #6c5ce7;
+            --neon-glow: 0 0 15px rgba(108, 92, 231, 0.3);
+            --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 15px 35px rgba(108, 92, 231, 0.15);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Grid Layout */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        /* Product Card */
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover), var(--neon-glow);
+        }
+
+        .card-image-wrapper {
+            width: 100%;
+            height: 220px;
+            overflow: hidden;
+            background-color: #eee;
+            position: relative;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover .card-image {
+            transform: scale(1.05);
+        }
+
+        .card-content {
+            padding: 25px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .card-desc {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .btn-buy {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+        }
+
+        .btn-buy:hover {
+            background-color: #5b4cc4;
+            box-shadow: 0 6px 15px rgba(108, 92, 231, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 900px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            overflow: hidden;
+            transform: scale(0.9);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.8);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: #fff;
+            transform: rotate(90deg);
+        }
+
+        /* Carousel */
+        .carousel-container {
+            position: relative;
+            background: #f1f2f6;
+            height: 100%;
+            min-height: 400px;
+            overflow: hidden;
+        }
+
+        .carousel-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.4s ease-in-out;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+        }
+
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.7);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .carousel-btn:hover {
+            background: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .carousel-btn.prev { left: 15px; }
+        .carousel-btn.next { right: 15px; }
+
+        /* Modal Details */
+        .modal-details {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .modal-price {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .modal-desc {
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .modal-btn-buy {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .modal-btn-buy:hover {
+            background-color: #5b4cc4;
+            box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .modal-content {
+                grid-template-columns: 1fr;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            .carousel-container {
+                min-height: 250px;
+            }
+            .modal-details {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>English Grammar Worksheets</h1>
+        <p class="subtitle">Premium resources for effective learning</p>
+    </header>
+
+    <div class="products-grid" id="productsGrid">
+        <!-- Cards will be injected here by JS -->
+    </div>
+</div>
+
+<!-- Modal Structure -->
+<div class="modal-overlay" id="productModal">
+    <div class="modal-content">
+        <button class="modal-close" id="closeModal">&times;</button>
+        
+        <div class="carousel-container">
+            <button class="carousel-btn prev" id="prevSlide">&#10094;</button>
+            <div class="carousel-track" id="carouselTrack">
+                <!-- Images injected here -->
+            </div>
+            <button class="carousel-btn next" id="nextSlide">&#10095;</button>
+        </div>
+
+        <div class="modal-details">
+            <h2 class="modal-title" id="modalTitle">Product Title</h2>
+            <div class="modal-price" id="modalPrice">$0.00</div>
+            <p class="modal-desc" id="modalDesc">Description goes here.</p>
+            <a href="#" class="modal-btn-buy" id="modalBuyLink">Купить</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Data Configuration
+    // Replace the image URLs below with your actual generated image paths/URLs
+    const products = [
+        {
+            id: 1,
+            title: "Worksheets Present Simple",
+            price: "190 р.",
+            description: "Master the basics of daily routines and habits. Includes 20+ exercises covering affirmative, negative, and interrogative forms with answer keys.",
+            images: [
+                "Present simple.png", 
+                "Present simple.png",
+                "Present simple.png"
+            ]
+        },
+        {
+            id: 2,
+            title: "Worksheets Present Continuous",
+            price: "190 р.",
+            description: "Focus on actions happening right now. Engaging visuals and scenarios to practice the -ing form effectively. Perfect for A1-A2 levels.",
+            images: [
+                "Present_continuous_cover.png",
+                "Present_continuous_cover.png",
+                "Present_continuous_cover.png",
+            ]
+        },
+        {
+            id: 3,
+            title: "Worksheets Past Simple",
+            price: "190 р.",
+            description: "Navigate through completed actions in the past. Comprehensive coverage of regular and irregular verbs with storytelling exercises.",
+            images: [
+                "Past_simple.png",
+                "Past_simple.png",
+                "Past_simple.png",
+            ]
+        },
+        {
+            id: 4,
+            title: "Worksheets Past Continuous",
+            price: "190 р.",
+            description: "Describe interrupted actions and parallel events in the past. Ideal for building narrative skills and understanding timeline contexts.",
+            images: [
+                "Present_continuous_cover.png",
+                "Present_continuous_cover.png",
+                "Present_continuous_cover.png"
+            ]
+        },
+        {
+            id: 5,
+            title: "Worksheets Present Perfect",
+            price: "190 р.",
+            description: "Connect the past to the present. Detailed exercises on life experiences, recent changes, and unfinished time periods.",
+            images: [
+                "Present_perfect.png",
+                "Present_perfect.png",
+                "Present_perfect.png"
+            ]
+        },
+        {
+            id: 6,
+            title: "Worksheets Present Perfect Continuous",
+            price: "190 р.",
+            description: "Emphasize duration and ongoing results. Advanced exercises to distinguish between simple and continuous perfect forms.",
+            images: [
+                "Present_perfect_continuous_cover.png",
+               "Present_perfect_continuous_cover.png",
+                "Present_perfect_continuous_cover.png"
+            ]
+        }
+    ];
+
+    // DOM Elements
+    const productsGrid = document.getElementById('productsGrid');
+    const modal = document.getElementById('productModal');
+    const closeModalBtn = document.getElementById('closeModal');
+    const carouselTrack = document.getElementById('carouselTrack');
+    const prevBtn = document.getElementById('prevSlide');
+    const nextBtn = document.getElementById('nextSlide');
+    
+    // Modal Content Elements
+    const modalTitle = document.getElementById('modalTitle');
+    const modalPrice = document.getElementById('modalPrice');
+    const modalDesc = document.getElementById('modalDesc');
+    const modalBuyLink = document.getElementById('modalBuyLink');
+
+    let currentSlideIndex = 0;
+    let currentImages = [];
+
+    // Initialize Grid
+    function initGrid() {
+        productsGrid.innerHTML = products.map(product => `
+            <div class="card" onclick="openModal(${product.id})">
+                <div class="card-image-wrapper">
+                    <img src="${product.images[0]}" alt="${product.title}" class="card-image">
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">${product.title}</h3>
+                    <p class="card-desc">${product.description}</p>
+                    <div class="card-footer">
+                        <span class="price">${product.price}</span>
+                        <button class="btn-buy">Купить</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Open Modal
+    window.openModal = function(id) {
+        const product = products.find(p => p.id === id);
+        if (!product) return;
+
+        currentImages = product.images;
+        currentSlideIndex = 0;
+
+        // Populate Content
+        modalTitle.textContent = product.title;
+        modalPrice.textContent = product.price;
+        modalDesc.textContent = product.description;
+        modalBuyLink.href = "#"; // User will set this link later
+
+        // Setup Carousel
+        setupCarousel(currentImages);
+
+        // Show Modal
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Prevent scrolling
+    };
+
+    // Setup Carousel
+    function setupCarousel(images) {
+        carouselTrack.innerHTML = images.map(img => `
+            <div class="carousel-slide">
+                <img src="${img}" alt="Product Image">
+            </div>
+        `).join('');
+        updateCarouselPosition();
+    }
+
+    function updateCarouselPosition() {
+        carouselTrack.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
+    }
+
+    function nextSlide() {
+        currentSlideIndex++;
+        if (currentSlideIndex >= currentImages.length) {
+            currentSlideIndex = 0;
+        }
+        updateCarouselPosition();
+    }
+
+    function prevSlide() {
+        currentSlideIndex--;
+        if (currentSlideIndex < 0) {
+            currentSlideIndex = currentImages.length - 1;
+        }
+        updateCarouselPosition();
+    }
+
+    // Close Modal
+    function closeModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+
+    // Event Listeners
+    closeModalBtn.addEventListener('click', closeModal);
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
+
+    nextBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        nextSlide();
+    });
+
+    prevBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        prevSlide();
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (!modal.classList.contains('active')) return;
+        if (e.key === 'Escape') closeModal();
+        if (e.key === 'ArrowRight') nextSlide();
+        if (e.key === 'ArrowLeft') prevSlide();
+    });
+
+    // Run initialization
+    initGrid();
+
+</script>
+
+</body>
+</html>
